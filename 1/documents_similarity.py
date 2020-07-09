@@ -147,10 +147,6 @@ euclidean_distance_bows = [[0] * 10 for i in range(10)]
 for i in range(10):
     for j in range(10):
         euclidean_distance_bows[i][j] = euclidean_distance(bow_vec[i], bow_vec[j])
-        print(i, j, euclidean_distance_bows[i][j], sep=', ')
-
-for i in range(10):
-    print(euclidean_distance_bows[i])
 
 ### tf-idfに対してユークリッド距離の計算
 euclidean_distance_tfidfs = [[0] * 10 for i in range(10)]
@@ -158,6 +154,50 @@ for i in range(10):
     for j in range(10):
         euclidean_distance_tfidfs[i][j] = euclidean_distance(tfidf_vec[i], tfidf_vec[j])
 
+## BoWとtf-idfの結果図示
+### 文書8
+w = 0.8
+plt.figure()
+bow_8_9 = np.array(bow_vec[8]) + np.array(bow_vec[9])
+bow_8_9_index = list(map(lambda t: t[0], filter(lambda t: t[1] > 0, enumerate(bow_8_9))))
+print(bow_8_9_index)
+
+bow_vec_8 = list(map(lambda t: t[1], (filter(lambda t: t[0] in bow_8_9_index, enumerate(bow_vec[8])))))
+bow_vec_9 = list(map(lambda t: t[1], (filter(lambda t: t[0] in bow_8_9_index, enumerate(bow_vec[9])))))
+tfidf_vec_8 = list(map(lambda t: t[1], (filter(lambda t: t[0] in bow_8_9_index, enumerate(tfidf_vec[8])))))
+tfidf_vec_9 = list(map(lambda t: t[1], (filter(lambda t: t[0] in bow_8_9_index, enumerate(tfidf_vec[9])))))
+bow_8_9_index = list(map(lambda x: str(x), bow_8_9_index))
+
+# その単語の出現するドキュメントの個数
+freqs = [0] * len(bow_vec[0])
+for i in bow_8_9_index:
+    i = int(i)
+    for bow in bow_vec:
+        if bow[i] > 0:
+            freqs[i] += 1
+
+print(freqs)
+print(bow_vec[8])
+print(bow_vec[9])
+
+plt.bar(bow_8_9_index, bow_vec_8, align="center", width=w, label='BoW')
+plt.bar(bow_8_9_index, tfidf_vec_8, align="center", width=w, label='tf-idf')
+plt.title("BoW and tf-idf of document 9")
+plt.xlabel("ID")
+plt.grid(True)
+plt.savefig('doc_8')
+plt.close('all')
+
+### 文書9
+plt.bar(bow_8_9_index, bow_vec_9, align="center", width=w, label='BoW')
+plt.bar(bow_8_9_index, tfidf_vec_9, align="center", width=w, label='tf-idf')
+plt.title("BoW and tf-idf of document 10")
+plt.xlabel("ID")
+plt.grid(True)
+plt.savefig('doc_9')
+plt.close('all')
+
+## 距離尺度によるヒートマップ
 plt.figure()
 sns.heatmap(cosine_similarity_bows)
 plt.savefig('cosine_similarity_bows.png')
