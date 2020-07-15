@@ -1,0 +1,105 @@
+% platex report && dvipdfmx report.dvi && open report.pdf
+\documentclass{jsarticle}
+\usepackage{listings,jlisting}
+\usepackage[dvipdfmx]{graphicx}
+\lstset{
+  basicstyle={\ttfamily},
+  identifierstyle={\small},
+  commentstyle={\smallitshape},
+  keywordstyle={\small\bfseries},
+  ndkeywordstyle={\small},
+  stringstyle={\small\ttfamily},
+  frame={tb},
+  breaklines=true,
+  columns=[l]{fullflexible},
+  numbers=left,
+  xrightmargin=0zw,
+  xleftmargin=3zw,
+  numberstyle={\scriptsize},
+  stepnumber=1,
+  numbersep=1zw,
+  lineskip=-0.5ex
+}
+
+\begin{document}
+
+\title{情報システム論実習 演習課題 5月19日分}
+\author{6930318812 沖野 雄哉}
+\maketitle
+
+\section{モンテカルロシミュレーション}
+
+\subsection{コード}
+\begin{lstlisting}[caption=MonteCarlo.R]
+M <- 100
+estimated_pi_values = 1:M
+
+for(i in 1:M) {
+    N <- 9999
+    x <- runif(N, 0, 1)
+    y <- runif(N, 0, 1)
+    sum <- x^2 + y^2
+
+    z = length(sum[sum<1])
+    v <- z * 4 / N
+    estimated_pi_values[i] <- v
+}
+
+message(mean(estimated_pi_values))
+\end{lstlisting}
+
+\subsection{出力結果}
+3.14139813981398
+
+\subsection{結果}
+$\pi$の値3.1415$\ldots$と近い値が得られた。
+モンテカルロ・シミュレーションの結果はどのような分布となるか
+100回行って調べてみると以下の図1のような結果となった。
+平均が$\pi$の正規分布のような分布となることが確認された。
+
+\newpage
+
+\begin{figure}[h]
+    \centering
+    \caption[モンテカルロ法による$\pi$の予測値の分布]{モンテカルロ法による$\pi$の予測値の分布}
+    \includegraphics[width=14cm]{EstimatedPiValues.png}
+\end{figure}
+
+\newpage
+
+\section{標本平均の平均}
+
+\subsection{コード}
+
+\begin{lstlisting}[caption=Norm.R]
+sample_means = 1:100
+for(i in 1:100) {
+  x <- rnorm(100, 20, sqrt(9))
+  sample_means[i] <- mean(x)
+}
+## pngで保存
+png("SampleMeans.png",width=12,height=12,res=300,unit="cm")
+hist(sample_means, main="Sample means", xlab="mean")
+
+## 平均, 分散の比較
+message("Mean: ", mean(sample_means))
+message("Variance: ", var(sample_means))
+\end{lstlisting}
+
+\subsection{出力結果}
+Mean: 19.9889456645273\\
+Variance: 0.0927933611128982\\
+
+また、標本平均の分布は以下図2のようになった。
+
+\begin{figure}[h]
+    \centering
+    \caption[標本平均の分散]{標本平均の分散}
+    \includegraphics[width=14cm]{SampleMeans.png}
+\end{figure}
+
+\subsection{考察}
+結果から、平均は20、分散は9/100に近い値が得られた。
+また、ヒストグラムから
+標本平均の分布は平均$\mu$、分散$\sigma^2/n$の正規分布に従うことが確認された。
+\end{document}
