@@ -1,7 +1,11 @@
 % platex report && dvipdfmx report.dvi && open report.pdf
 \documentclass{jsarticle}
 \usepackage{listings,jlisting}
+\usepackage{url}
 \usepackage[dvipdfmx]{graphicx}
+\usepackage[hang,small,bf]{caption}
+\usepackage[subrefformat=parens]{subcaption}
+\captionsetup{compatibility=false}
 \lstset{
   basicstyle={\ttfamily},
   identifierstyle={\small},
@@ -23,83 +27,100 @@
 
 \begin{document}
 
-\title{情報システム論実習 演習課題 5月19日分}
+\title{情報システム論実習 テキスト分析演習課題 07月16日分}
 \author{6930318812 沖野 雄哉}
 \maketitle
 
-\section{モンテカルロシミュレーション}
+\section{データセットの概要}
+データセットには、
 
-\subsection{コード}
-\begin{lstlisting}[caption=MonteCarlo.R]
-M <- 100
-estimated_pi_values = 1:M
+\section{利用した距離尺度}
+以下の二つの距離尺度を利用した。
+\begin{itemize}
+  \item ユークリッド距離
+  \item コサイン類似度
+\end{itemize}
 
-for(i in 1:M) {
-    N <- 9999
-    x <- runif(N, 0, 1)
-    y <- runif(N, 0, 1)
-    sum <- x^2 + y^2
+\section{入力ドキュメント}
+以下の文書を対象に分析を行った。
 
-    z = length(sum[sum<1])
-    v <- z * 4 / N
-    estimated_pi_values[i] <- v
-}
+\begin{itemize}
+  \item View update is an important mechanism that allows updates on a view by translating them into the corresponding updates on the base relations.
+  \item The existing literature has shown the ambiguity of translating view updates.
+  \item To address this ambiguity, we propose a robust language-based approach for making view update strategies programmable and validatable.
+  \item Specifically, we introduce a novel approach to use Datalog to describe these update strategies.
+  \item We present a fragment of the Datalog language for which our validation is both sound and complete.
+  \item We propose a validation algorithm to check the well-behavedness of the written Datalog programs.
+  \item This fragment not only has good properties in theory but is also useful for solving practical view updates.
+  \item Furthermore, we develop an algorithm for optimizing user-written programs to efficiently implement updatable views in relational database management systems.
+  \item We have implemented our proposed approach.
+  \item The experimental results show that our framework is feasible and efficient in practice.
+\end{itemize}
 
-message(mean(estimated_pi_values))
-\end{lstlisting}
-
-\subsection{出力結果}
-3.14139813981398
-
-\subsection{結果}
-$\pi$の値3.1415$\ldots$と近い値が得られた。
-モンテカルロ・シミュレーションの結果はどのような分布となるか
-100回行って調べてみると以下の図1のような結果となった。
-平均が$\pi$の正規分布のような分布となることが確認された。
-
-\newpage
+\section{実行結果}
+ドキュメント同士の距離を計算し、ヒートマップで表現した結果次のようになった。
 
 \begin{figure}[h]
-    \centering
-    \caption[モンテカルロ法による$\pi$の予測値の分布]{モンテカルロ法による$\pi$の予測値の分布}
-    \includegraphics[width=14cm]{EstimatedPiValues.png}
+ \begin{minipage}[b]{0.50\linewidth}
+  \centering
+  \includegraphics[keepaspectratio, scale=0.42]
+  {./euclidean_distance_bows.png}
+  \subcaption{BoW, ユークリッド距離}\label{euclidean_bow}
+ \end{minipage}
+ \begin{minipage}[b]{0.50\linewidth}
+  \centering
+  \includegraphics[keepaspectratio, scale=0.42]
+  {./euclidean_distance_tfidfs.png}
+  \subcaption{tf-idf, ユークリッド距離}\label{euclidean_tfidf}
+ \end{minipage}
+ \begin{minipage}[b]{0.50\linewidth}
+  \centering
+  \includegraphics[keepaspectratio, scale=0.42]
+  {./cosine_similarity_bows.png}
+  \subcaption{BoW, コサイン類似度}\label{cosine_bow}
+ \end{minipage}
+ \begin{minipage}[b]{0.50\linewidth}
+  \centering
+  \includegraphics[keepaspectratio, scale=0.42]
+  {./cosine_similarity_tfidfs.png}
+  \subcaption{tf-idf, コサイン類似度}\label{cosine_tfidf}
+ \end{minipage}
 \end{figure}
 
-\newpage
+\section{実行結果の考察}
 
-\section{標本平均の平均}
+コサイン類似度は大きな違いはないが、全体的に類似度が下がっていると捉えられる。
+これは、類似度が大きい二つの文書は同じ語をドキュメントに含んでいるため、tfidfでの表現はベクトルのノルムが小さくなり、コサイン類似度が小さくなったと考えられる。\\
+また、ユークリッド距離については、全体的な傾向として距離関係が逆転しているように見えた。
+文書9、10に着目して、それぞれのtfidfの値を出力した結果が以下の図である。
+文書9は文書が小さく3語しかないため、全体的にtfの値が大きくなり、tf-idfの値が大きくなっている。
+また文書10は文書10にしか含まれない単語を多く含んでいるが、語数が多いため、tf-idf値が小さくなっている。
+BoWにおけるユークリッド距離は単語数が少ない文書については小さくなる傾向があるが、上記の理由からtf-idfで表現した場合は単語数が少ない文書の方がユークリッド距離が大きくなり、距離関係の逆転が起こっているのではないかと考えられる。
 
-\subsection{コード}
+\section{感想}
+文書を単語の集合として表現することでおおまかに文書の類似度を測ることができると分かった。
+直感的には時系列的な情報が全てなくなっている状態でも大丈夫なのか気になる。
+文書表現に時系列情報を含める手法があるのか、その場合だとどのように変わるのか知りたい。
+ただ時系列を考慮すると、大量のデータを処理して類似する文書を取得したいケースなどを考えると、計算量の問題がありそうだとも思うので一長一短あるとも思う。
+また文書の類似度をヒューリスティックにでも評価することは難しいと感じたので、どのような評価指標が用いられているのか調べたい。
 
-\begin{lstlisting}[caption=Norm.R]
-sample_means = 1:100
-for(i in 1:100) {
-  x <- rnorm(100, 20, sqrt(9))
-  sample_means[i] <- mean(x)
-}
-## pngで保存
-png("SampleMeans.png",width=12,height=12,res=300,unit="cm")
-hist(sample_means, main="Sample means", xlab="mean")
-
-## 平均, 分散の比較
-message("Mean: ", mean(sample_means))
-message("Variance: ", var(sample_means))
-\end{lstlisting}
-
-\subsection{出力結果}
-Mean: 19.9889456645273\\
-Variance: 0.0927933611128982\\
-
-また、標本平均の分布は以下図2のようになった。
+\section{ソースコード}
+\url{https://github.com/oky-123/soc_info_mining/blob/master/2a}
 
 \begin{figure}[h]
-    \centering
-    \caption[標本平均の分散]{標本平均の分散}
-    \includegraphics[width=14cm]{SampleMeans.png}
+ \begin{minipage}[b]{0.50\linewidth}
+  \centering
+  \includegraphics[keepaspectratio, scale=0.42]
+  {./doc_8.png}
+  \subcaption{blue: BoW, orange: tf-idf}\label{doc_8}
+ \end{minipage}
+ \begin{minipage}[b]{0.50\linewidth}
+  \centering
+  \includegraphics[keepaspectratio, scale=0.42]
+  {./doc_9.png}
+  \subcaption{blue: BoW, orange: tf-idf}\label{doc_9}
+ \end{minipage}
 \end{figure}
 
-\subsection{考察}
-結果から、平均は20、分散は9/100に近い値が得られた。
-また、ヒストグラムから
-標本平均の分布は平均$\mu$、分散$\sigma^2/n$の正規分布に従うことが確認された。
+
 \end{document}

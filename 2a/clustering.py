@@ -206,17 +206,17 @@ feature = pca.transform(tf_idf_array)
 ## 3次元プロット
 import seaborn as sns
 from mpl_toolkits.mplot3d import Axes3D
-COLORS = sns.hls_palette(num_clusters, l=0.5, s=1)
+colors = sns.hls_palette(num_clusters, l=0.5, s=1)
 sns.set_style("darkgrid")
 fig = plt.figure()
 ax = Axes3D(fig)
 for i in range(num_clusters):
     tmp_feature = feature[clusters[:] == i]
-    ax.plot(tmp_feature[:, 0], tmp_feature[:, 1], tmp_feature[:, 2], marker="o", linestyle='None', c=COLORS[i])
+    ax.plot(tmp_feature[:, 0], tmp_feature[:, 1], tmp_feature[:, 2], marker="o", linestyle='None', c=colors[i])
 plt.show()
 
 ## 2次元プロット
-cluster_colors = list(map(lambda x: COLORS[x], clusters))
+cluster_colors = list(map(lambda x: colors[x], clusters))
 plt.figure(figsize=(6, 6))
 plt.scatter(feature[:, 0], feature[:, 1], alpha=0.8, c=cluster_colors)
 plt.grid()
