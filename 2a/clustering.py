@@ -1,8 +1,6 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
-import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
 import nltk
 import collections
 from scipy.spatial import distance
@@ -188,7 +186,7 @@ def special_pearsonr_corrcoef(X, Y):
 def cosine_distances(X, Y=None, Y_norm_squared=None, squared=False):
     return special_pearsonr_corrcoef(X, Y)
 
-# K-means
+# k-means
 import sys
 num_clusters = int(sys.argv[1])
 KMeans.euclidean_distances = cosine_distances
